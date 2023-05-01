@@ -7,6 +7,8 @@ const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 
+const dev = false
+const BASEURL = dev ? 'http://localhost:3000' : 'https://chat-app-be-eight.vercel.app'
 inputMessage.value = 'Tes tes'
 
 let formatter = new Intl.DateTimeFormat('id-ID', {
@@ -39,15 +41,15 @@ inputMessage.addEventListener('keydown', function(e) {
 sendMessageButton.addEventListener('click', function(e) {
     const message = inputMessage.value
     e.preventDefault()
-    fetch('http://localhost:3000/chat', {
+    fetch(BASEURL + '/chat', {
         method : 'POST',
         headers : {
           'Content-Type' : 'application/json'
         },
         body : JSON.stringify({ id, message })
-      })
-      inputMessage.value = ''
-      createChatByUser(message)
+    })
+    inputMessage.value = ''
+    createChatByUser(message)
 })
 
 
