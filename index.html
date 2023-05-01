@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+</head>
+
+<body>
+    <h1 style="margin-bottom: 20px;">Chat Apps</h>
+        <div class="container border">
+            <div class="container-user border">
+                <div class="user">
+                    <span id="username">Login</span>
+                </div>
+                <!-- <div class="item-card">
+                    <span data-id="1641471038593">Budi</span>
+                    <span class="last-chat">Mauko Berkelahi</span>
+                </div> -->
+            </div>
+            <div class="container-chat border">
+                <div class="chat-contact border">
+                    <span id="user-to" data-id="1641471038593">Budi</span>
+                    <span id="user-to-status" class="status">Offline</span>
+                </div>
+                <div class="chat-output border">
+                    <div id="no-chat">
+                        <div>
+                            <strong>Login</strong> or <strong>Click Contact</strong> <br> To Chat
+                        </div>
+                    </div>
+                    <!-- <div class="chat by-user">
+                        <div class="chat-text">
+                            <span class="chat-txt">Apa Kabar</span>
+                            <span class="chat-date">23:15</span>
+                        </div>
+                    </div>
+                    <div class="chat">
+                        <div class="chat-text">
+                            <span class="chat-txt">Kabar Baik</span>
+                            <span class="chat-date">23:15</span>
+                        </div>
+                    </div>
+                    <div class="chat">
+                        <div class="chat-text">
+                            <span class="chat-txt">Oklah</span>
+                            <span class="chat-date">23:15</span>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="chat-input">
+                    <input id="text" type="text">
+                    <button id="send">Send</button>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>
