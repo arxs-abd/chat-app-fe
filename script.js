@@ -7,8 +7,8 @@ const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 
-const dev = false
-const BASEURL = dev ? 'http://localhost:3000' : 'https://chat-app-be-eight.vercel.app'
+const dev = true
+const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
 inputMessage.value = 'Tes tes'
 
 let formatter = new Intl.DateTimeFormat('id-ID', {
