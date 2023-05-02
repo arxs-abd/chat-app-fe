@@ -3,11 +3,10 @@ const containerUser = document.querySelector('.container-user')
 const chatOutput = document.querySelector('.chat-output')
 const inputMessage = document.querySelector('#text')
 const sendMessageButton = document.querySelector('#send')
-// const channel = new BroadcastChannel('chat-channel')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 
-const dev = false
+const dev = true
 const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
 inputMessage.value = 'Tes tes'
 
@@ -18,8 +17,24 @@ let formatter = new Intl.DateTimeFormat('id-ID', {
 
 const userLogin = 'Aris'
 const id = 'id' + Math.random().toString(16).slice(2)
-// const userLogin = prompt('Input Username')
 login.innerText = userLogin
+
+login.addEventListener('click', async function(e) {
+    e.preventDefault()
+    const username = prompt('Masukkan Username')
+    const password = prompt('Masukkan Password')
+
+    const options = {
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({ username, password })
+    }
+    const result = await fetchJSON('/api/login', options)
+    console.log(result)
+})
+
 
 const pusher = new Pusher('914eb719506342bd7d28', {
     cluster : 'ap1'
@@ -34,14 +49,13 @@ channel.bind('new-message', data => {
 })
 
 inputMessage.addEventListener('keydown', function(e) {
-    // e.preventDefault()
     if (e.keyCode === 13) sendMessageButton.click()
 })
 
-sendMessageButton.addEventListener('click', function(e) {
+sendMessageButton.addEventListener('click', async function(e) {
     const message = inputMessage.value
     e.preventDefault()
-    fetch(BASEURL + '/chat', {
+    await fetchJSON('/api/chat', {
         method : 'POST',
         headers : {
           'Content-Type' : 'application/json'
@@ -93,3 +107,15 @@ function createChatByOtherUser(msg) {
     chatOutput.scrollBy(0, chatOutput.clientHeight)
 }
 
+// Utility
+
+async function fetchJSON(url, options = {}) {
+    try {
+        const response = await fetch(BASEURL + url, options)
+        if (!response.ok) throw new Error(response.statusText)
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error('Error fetching data:', error)
+    }
+}
