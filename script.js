@@ -6,7 +6,7 @@ const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 
-const dev = true
+const dev = getEnv(window.location.href)
 const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
 inputMessage.value = 'Tes tes'
 
@@ -121,4 +121,9 @@ async function fetchJSON(url, options = {}) {
     } catch (error) {
         console.error('Error fetching data:', error)
     }
+}
+
+function getEnv(url) {
+    if (url.split('//')[0] === 'http:') return true
+    return false
 }
