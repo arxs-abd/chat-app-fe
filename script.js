@@ -17,6 +17,7 @@ let formatter = new Intl.DateTimeFormat('id-ID', {
 
 const userLogin = 'Aris'
 const id = 'id' + Math.random().toString(16).slice(2)
+let socket_id
 login.innerText = userLogin
 
 login.addEventListener('click', async function(e) {
@@ -39,13 +40,14 @@ login.addEventListener('click', async function(e) {
 const pusher = new Pusher('914eb719506342bd7d28', {
     cluster : 'ap1'
 })
+pusher.connection.bind('connected', () => {
+    socket_id = pusher.connection.socket_id
+})
 
 const channel = pusher.subscribe('chat-room')
 channel.bind('new-message', data => {
     const msg = data.message
-    const senderId = data.id
-
-    if (senderId !== id) createChatByOtherUser(msg)
+    createChatByOtherUser(msg)
 })
 
 inputMessage.addEventListener('keydown', function(e) {
@@ -58,7 +60,8 @@ sendMessageButton.addEventListener('click', async function(e) {
     await fetchJSON('/api/chat', {
         method : 'POST',
         headers : {
-          'Content-Type' : 'application/json'
+          'Content-Type' : 'application/json',
+          'x-socket-id' : socket_id
         },
         body : JSON.stringify({ id, message })
     })
