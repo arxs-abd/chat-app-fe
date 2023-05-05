@@ -1,4 +1,6 @@
+// HTML Component
 const login = document.querySelector('.user')
+const findUser = document.querySelector('.find-user')
 const containerUser = document.querySelector('.container-user')
 const chatOutput = document.querySelector('.chat-output')
 const inputMessage = document.querySelector('#text')
@@ -6,19 +8,46 @@ const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 
+// Environment
 const dev = getEnv(window.location.href)
 const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
 inputMessage.value = 'Tes tes'
-
-let formatter = new Intl.DateTimeFormat('id-ID', {
-    hour: '2-digit', 
-    minute: '2-digit',
-})
-
-const userLogin = 'Aris'
-const id = 'id' + Math.random().toString(16).slice(2)
 let socket_id
-login.innerText = userLogin
+
+// Data
+let data = getFromLocalStorage('user-data', {})
+let message = getFromLocalStorage('message-data')
+let contact = getFromLocalStorage('contact-data') 
+
+// Check Is Login
+if (data.username) {
+    login.innerText = data.username
+
+    // Create Conversation Id
+    getConversation()
+    
+}
+
+findUser.addEventListener('click', async function(e) {
+    if (!data.username) return alert('Anda Harus Login')
+    console.log(data)
+
+    const username = prompt('Masukkan Username : ')
+    const options = {
+        method : 'GET',
+        headers : {
+          'Content-Type' : 'application/json',
+          'Authorization' : 'Bearer ' + data.accessToken
+        },
+    }
+    const result = await fetchJSON('/api/conversation/find?username=' + username, options)
+    if (!result) return alert('Username tidak ditemukan')
+
+    
+
+    console.log(result)
+
+})
 
 login.addEventListener('click', async function(e) {
     e.preventDefault()
@@ -33,7 +62,15 @@ login.addEventListener('click', async function(e) {
         body : JSON.stringify({ username, password })
     }
     const result = await fetchJSON('/api/login', options)
-    console.log(result)
+    if (!result) return alert('Gagal, Silahkan Melakukan login ulang')
+    alert(`Login dengan username ${result.data.username} Berhasil`)
+    data = result.data
+    data.accessToken = result.accessToken
+    setFromLocalStorage('user-data', data)
+    
+    login.innerText = result.data.username
+
+    getConversation()
 })
 
 
@@ -50,6 +87,8 @@ channel.bind('new-message', data => {
     createChatByOtherUser(msg)
 })
 
+// Component
+
 inputMessage.addEventListener('keydown', function(e) {
     if (e.keyCode === 13) sendMessageButton.click()
 })
@@ -63,7 +102,7 @@ sendMessageButton.addEventListener('click', async function(e) {
           'Content-Type' : 'application/json',
           'x-socket-id' : socket_id
         },
-        body : JSON.stringify({ id, message })
+        body : JSON.stringify({ message })
     })
     inputMessage.value = ''
     createChatByUser(message)
@@ -110,20 +149,35 @@ function createChatByOtherUser(msg) {
     chatOutput.scrollBy(0, chatOutput.clientHeight)
 }
 
-// Utility
+function createContact(contact) {
+    const div = document.createElement('div')
+    div.classList.add('item-card')
 
-async function fetchJSON(url, options = {}) {
-    try {
-        const response = await fetch(BASEURL + url, options)
-        if (!response.ok) throw new Error(response.statusText)
-        const data = await response.json()
-        return data
-    } catch (error) {
-        console.error('Error fetching data:', error)
-    }
+    const username = document.createElement('span')
+    const lastChat = document.createElement('span')
+    lastChat.classList.add('last-chat')
+
+    username.innerText = contact.sender.username
+    lastChat.innerText = 'Ini Chat Terakhir'
+
+    div.appendChild(username)
+    div.appendChild(lastChat)
+
+    containerUser.appendChild(div)
 }
 
-function getEnv(url) {
-    if (url.split('//')[0] === 'http:') return true
-    return false
+async function getConversation() {
+    const options = {
+        method : 'GET',
+        headers : {
+          'Content-Type' : 'application/json',
+          'Authorization' : 'Bearer ' + data.accessToken
+        },
+    }
+    const result = await fetchJSON('/api/conversation', options)
+
+    const contact = result.data
+    for (const user of contact) {
+        createContact(user)
+    }
 }

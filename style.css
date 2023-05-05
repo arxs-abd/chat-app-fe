@@ -163,6 +163,19 @@ button {
     cursor: pointer;
 }
 
+.find-user {
+    align-content: center;
+    justify-content: center;
+    text-align: left;
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+    background-color: rgb(29, 193, 230);
+    color: white;
+    font-size: medium;
+    cursor: pointer;
+}
+
 .checkout-items {
     display: flex;
     padding: 5px;
