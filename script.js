@@ -18,13 +18,14 @@ let socket_id
 let data = getFromLocalStorage('user-data', {})
 let message = getFromLocalStorage('message-data')
 let contact = getFromLocalStorage('contact-data') 
+let chatRoom = ''
 
 // Check Is Login
 if (data.username) {
     login.innerText = data.username
 
     // Create Conversation Id
-    getConversation()
+    getAllConversation()
     
 }
 
@@ -70,7 +71,7 @@ login.addEventListener('click', async function(e) {
     
     login.innerText = result.data.username
 
-    getConversation()
+    getAllConversation()
 })
 
 
@@ -82,10 +83,13 @@ pusher.connection.bind('connected', () => {
 })
 
 const channel = pusher.subscribe('chat-room')
-channel.bind('new-message', data => {
-    const msg = data.message
-    createChatByOtherUser(msg)
-})
+
+function listenChannel() {
+    channel.bind(chatRoom, data => {
+        console.log(data)
+        createChatByOtherUser(data)
+    })
+}
 
 // Component
 
@@ -94,34 +98,44 @@ inputMessage.addEventListener('keydown', function(e) {
 })
 
 sendMessageButton.addEventListener('click', async function(e) {
+    const userData = getFromLocalStorage('user-data', {})
+    const id = userData.id
     const message = inputMessage.value
+    const conversationId = sendMessageButton.dataset.id
     e.preventDefault()
     await fetchJSON('/api/chat', {
         method : 'POST',
         headers : {
           'Content-Type' : 'application/json',
-          'x-socket-id' : socket_id
+          'x-socket-id' : socket_id,
+          'Authorization' : 'Bearer ' + userData.accessToken
         },
-        body : JSON.stringify({ message })
+        body : JSON.stringify({ conversationId, id, message})
     })
     inputMessage.value = ''
-    createChatByUser(message)
+    const data = {
+        created_at : new Date().toISOString(),
+        message
+    }
+    createChatByUser(data)
 })
 
 
 function createChatByUser(msg) {
+    const time = new Date(msg.created_at)
+
     const div = document.createElement('div')
     div.classList.add('chat', 'by-user')
     const divChat = document.createElement('div')
     divChat.classList.add('chat-text')
     const spanTxt = document.createElement('span')
     spanTxt.classList.add('chat-txt')
-    spanTxt.textContent = msg
+    spanTxt.textContent = msg.message
 
     const spanDate = document.createElement('span')
     spanDate.classList.add('chat-date')
-    spanDate.textContent = formatter.format(new Date())
-
+    spanDate.textContent = formatter.format(time)
+    
     divChat.appendChild(spanTxt)
     divChat.appendChild(spanDate)
     div.appendChild(divChat)
@@ -130,17 +144,19 @@ function createChatByUser(msg) {
 }
 
 function createChatByOtherUser(msg) {
+    const time = new Date(msg.created_at)
+
     const div = document.createElement('div')
     div.classList.add('chat')
     const divChat = document.createElement('div')
     divChat.classList.add('chat-text')
     const spanTxt = document.createElement('span')
     spanTxt.classList.add('chat-txt')
-    spanTxt.textContent = msg
+    spanTxt.textContent = msg.message
 
     const spanDate = document.createElement('span')
     spanDate.classList.add('chat-date')
-    spanDate.textContent = formatter.format(new Date())
+    spanDate.textContent = formatter.format(time)
 
     divChat.appendChild(spanTxt)
     divChat.appendChild(spanDate)
@@ -163,10 +179,35 @@ function createContact(contact) {
     div.appendChild(username)
     div.appendChild(lastChat)
 
+    div.addEventListener('click', async function(e) {
+        const options = {
+            method : 'GET',
+            headers : {
+              'Content-Type' : 'application/json',
+              'Authorization' : 'Bearer ' + data.accessToken
+            },
+        }
+        const conversation = await fetchJSON('/api/conversation/message/' + contact.id_chat, options)
+        sendMessageButton.dataset.id = contact.id_chat
+        chatRoom = contact.id_chat
+
+        listenChannel()
+        chatUser.innerText = contact.sender.username
+        
+        const message = conversation.chat
+        
+        if (message.length === 0) removeChat()
+
+        for (const chat of message) {
+            if (chat.sender_id === data.id) createChatByUser(chat)
+            else createChatByOtherUser(chat)
+        }
+    })
+
     containerUser.appendChild(div)
 }
 
-async function getConversation() {
+async function getAllConversation() {
     const options = {
         method : 'GET',
         headers : {
@@ -180,4 +221,10 @@ async function getConversation() {
     for (const user of contact) {
         createContact(user)
     }
+}
+
+function removeChat() {
+    const allChat = document.querySelectorAll('.chat')
+
+    for (const chat of allChat) chat.remove()
 }
