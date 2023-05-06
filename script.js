@@ -11,7 +11,6 @@ const chatStatus = document.querySelector('#user-to-status')
 // Environment
 const dev = getEnv(window.location.href)
 const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
-inputMessage.value = 'Tes tes'
 let socket_id
 
 // Data
@@ -31,7 +30,6 @@ if (data.username) {
 
 findUser.addEventListener('click', async function(e) {
     if (!data.username) return alert('Anda Harus Login')
-    console.log(data)
 
     const username = prompt('Masukkan Username : ')
     const options = {
@@ -42,11 +40,9 @@ findUser.addEventListener('click', async function(e) {
         },
     }
     const result = await fetchJSON('/api/conversation/find?username=' + username, options)
-    if (!result) return alert('Username tidak ditemukan')
+    if (!result) return
 
-    
-
-    console.log(result)
+    getAllConversation()
 
 })
 
@@ -63,7 +59,7 @@ login.addEventListener('click', async function(e) {
         body : JSON.stringify({ username, password })
     }
     const result = await fetchJSON('/api/login', options)
-    if (!result) return alert('Gagal, Silahkan Melakukan login ulang')
+    if (!result) return
     alert(`Login dengan username ${result.data.username} Berhasil`)
     data = result.data
     data.accessToken = result.accessToken
@@ -99,6 +95,9 @@ inputMessage.addEventListener('keydown', function(e) {
 
 sendMessageButton.addEventListener('click', async function(e) {
     const userData = getFromLocalStorage('user-data', {})
+
+    if (!userData.username) return alert('Anda Harus Login')
+
     const id = userData.id
     const message = inputMessage.value
     const conversationId = sendMessageButton.dataset.id
@@ -191,6 +190,10 @@ function createContact(contact) {
         sendMessageButton.dataset.id = contact.id_chat
         chatRoom = contact.id_chat
 
+        removeSelectedContact()
+
+        if (!div.classList.contains('selected')) div.classList.add('selected')
+
         listenChannel()
         chatUser.innerText = contact.sender.username
         
@@ -218,6 +221,9 @@ async function getAllConversation() {
     const result = await fetchJSON('/api/conversation', options)
 
     const contact = result.data
+
+    removeContact()
+
     for (const user of contact) {
         createContact(user)
     }
@@ -227,4 +233,16 @@ function removeChat() {
     const allChat = document.querySelectorAll('.chat')
 
     for (const chat of allChat) chat.remove()
+}
+
+function removeContact() {
+    const allContact = document.querySelectorAll('.item-card')
+
+    for (const contact of allContact) contact.remove()
+}
+
+function removeSelectedContact() {
+    const allContact = document.querySelectorAll('.item-card')
+
+    for (const contact of allContact) if (contact.classList.contains('selected')) contact.classList.remove('selected')
 }

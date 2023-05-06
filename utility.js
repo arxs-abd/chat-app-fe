@@ -8,7 +8,12 @@ let formatter = new Intl.DateTimeFormat('id-ID', {
 async function fetchJSON(url, options = {}) {
     try {
         const response = await fetch(BASEURL + url, options)
-        if (!response.ok) throw new Error(response.statusText)
+        if (!response.ok) {
+            const data = await response.json()
+            return alert(data.msg)
+            // return alert(response.text())
+            // throw new Error(response.statusText)
+        }
         const data = await response.json()
         return data
     } catch (error) {
