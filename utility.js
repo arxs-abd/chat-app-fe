@@ -33,5 +33,3 @@ function getFromLocalStorage(key, falseResult = []) {
 function setFromLocalStorage(key, value) {
     return localStorage.setItem(key, JSON.stringify(value))
 }
-
-// function

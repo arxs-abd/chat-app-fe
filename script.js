@@ -2,13 +2,19 @@
 const login = document.querySelector('.user')
 const findUser = document.querySelector('.find-user')
 const containerUser = document.querySelector('.container-user')
+const containerChat = document.querySelector('.container-chat')
 const chatOutput = document.querySelector('.chat-output')
 const inputMessage = document.querySelector('#text')
 const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
+const backButton = document.querySelector('#back')
+// backButton.style.display = 'none'
+// console.log(backButton)
 
 // Environment
+// const mobileWidth = 560
+const mobileWidth = 560
 const dev = getEnv(window.location.href)
 const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
 let socket_id
@@ -18,6 +24,13 @@ let data = getFromLocalStorage('user-data', {})
 let message = getFromLocalStorage('message-data')
 let contact = getFromLocalStorage('contact-data') 
 let chatRoom = ''
+let IsMobile = false
+
+// IsMobile
+checkMobile()
+window.addEventListener('resize', function(e) {
+    checkMobile()
+})
 
 // Check Is Login
 if (data.username) {
@@ -119,6 +132,11 @@ sendMessageButton.addEventListener('click', async function(e) {
     createChatByUser(data)
 })
 
+backButton.addEventListener('click', function(e) {
+    containerChat.classList.add('hidden')
+    containerUser.classList.remove('hidden')
+})
+
 
 function createChatByUser(msg) {
     const time = new Date(msg.created_at)
@@ -205,6 +223,12 @@ function createContact(contact) {
             if (chat.sender_id === data.id) createChatByUser(chat)
             else createChatByOtherUser(chat)
         }
+
+        // toggle
+        if (IsMobile) {
+            containerUser.classList.add('hidden')
+            containerChat.classList.remove('hidden')
+        }
     })
 
     containerUser.appendChild(div)
@@ -245,4 +269,18 @@ function removeSelectedContact() {
     const allContact = document.querySelectorAll('.item-card')
 
     for (const contact of allContact) if (contact.classList.contains('selected')) contact.classList.remove('selected')
+}
+
+function checkMobile() {
+    if (window.innerWidth < mobileWidth) {
+        IsMobile = true
+        if (!containerChat.classList.contains('hidden')) containerChat.classList.add('hidden')
+        if (backButton.style.display !== 'flex') backButton.style.display = 'flex'
+    } else {
+        IsMobile = false
+        if (containerChat.classList.contains('hidden')) containerChat.classList.remove('hidden')
+        if (containerUser.classList.contains('hidden')) containerUser.classList.remove('hidden')
+        if (backButton.style.display !== 'none') backButton.style.display = 'none'
+
+    }
 }
