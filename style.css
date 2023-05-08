@@ -5,10 +5,14 @@
 #18122B */
 
 :root {
-  --bgcolor : #18122B;
+  --bgcolor : #2C3333;
+  --color1 : #395B64;
+  --color2 : #A5C9CA;
+  --color3 : #E7F6F2;
+  /* --bgcolor : #18122B;
   --color1 : #635985;
   --color2 : #443C68;
-  --color3 : #393053;
+  --color3 : #393053; */
 }
 
 * {
@@ -137,7 +141,7 @@ h1 {
   max-width: 90%;
   font-size: 20px;
   width: fit-content;
-  background-color: var(--color1);
+  background-color: var(--color2);
   padding: 5px;
   border-radius: 4px;
   display: flex;
@@ -161,7 +165,7 @@ h1 {
 }
 
 .by-user .chat-text {
-  background-color: var(--bgcolor);
+  background-color: var(--color1);
 }
 
 .chat-input {
@@ -187,7 +191,7 @@ button {
   align-self: flex-start;
   width: 30%;
   height: 100%;
-  background-color: var(--color3);
+  background-color: var(--color2);
 }
 
 #username {
