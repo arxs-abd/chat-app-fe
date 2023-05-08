@@ -5,14 +5,14 @@
 #18122B */
 
 :root {
-  --bgcolor : #2C3333;
-  --color1 : #395B64;
-  --color2 : #A5C9CA;
-  --color3 : #E7F6F2;
   /* --bgcolor : #18122B;
   --color1 : #635985;
   --color2 : #443C68;
   --color3 : #393053; */
+  --bgcolor : #050505;
+  --color1 : #6A6767; /*bg button*/
+  --color2 : #383838; /*bg contact*/
+  --color3 : #171917; /* bg chat*/
 }
 
 * {
