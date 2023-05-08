@@ -1,25 +1,7 @@
-/* https://colorhunt.co/palette/635985443c6839305318122b */
-/* #635985
-#443C68
-#393053
-#18122B */
-
-:root {
-  --bgcolor : #18122B;
-  --color1 : #635985;
-  --color2 : #443C68;
-  --color3 : #393053;
-}
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  color: white;
-}
-
-html {
-  background-color: var(--bgcolor);
 }
 
 h1 {
@@ -37,15 +19,18 @@ h1 {
   /* background-color: rgb(0, 64, 255); */
 }
 
+.border {
+  border: solid black 1px;
+}
+
 /* Container Chat */
 
 .container-chat {
   width: 65%;
-  /* padding: 10px; */
+  padding: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: var(--color3);
   /* height: 100%; */
 }
 
@@ -71,10 +56,8 @@ h1 {
 .chat-contact {
   display: flex;
   /* flex-direction: column; */
-  padding: 5px;
   column-gap: 10px;
-  height: 12%;
-  background-color: var(--color1);
+  height: 10%;
 }
 
 #back {
@@ -90,7 +73,7 @@ h1 {
 }
 
 #back:hover {
-  background-color: var(--color1);
+  background-color: rgb(29, 193, 230);
   color: white;
 }
 
@@ -137,7 +120,7 @@ h1 {
   max-width: 90%;
   font-size: 20px;
   width: fit-content;
-  background-color: var(--color1);
+  background-color: rgb(29, 193, 230);
   padding: 5px;
   border-radius: 4px;
   display: flex;
@@ -161,7 +144,7 @@ h1 {
 }
 
 .by-user .chat-text {
-  background-color: var(--bgcolor);
+  background-color: rgb(95, 89, 89);
 }
 
 .chat-input {
@@ -187,7 +170,6 @@ button {
   align-self: flex-start;
   width: 30%;
   height: 100%;
-  background-color: var(--color3);
 }
 
 #username {
@@ -207,7 +189,7 @@ button {
 }
 
 .item-card:hover {
-  background-color: var(--bgcolor);
+  background-color: rgb(95, 89, 89);
   color: white;
   cursor: pointer;
 }
@@ -219,7 +201,7 @@ button {
   margin: 5px;
   padding: 5px;
   text-align: center;
-  background-color: var(--color1);
+  background-color: rgb(29, 193, 230);
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -232,7 +214,7 @@ button {
   margin: 5px;
   padding: 5px;
   text-align: center;
-  background-color: var(--color1);
+  background-color: rgb(29, 193, 230);
   color: white;
   font-size: medium;
   cursor: pointer;
@@ -262,14 +244,10 @@ button {
 }
 
 .selected {
-  background-color: var(--bgcolor);
+  background-color: rgb(95, 89, 89);
   color: white;
 }
 
 .hidden {
   display: none;
-}
-
-.border {
-  /* border: solid white 1px; */
 }

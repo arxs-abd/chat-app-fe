@@ -41,6 +41,8 @@ if (data.username) {
     
 }
 
+
+
 findUser.addEventListener('click', async function(e) {
     if (!data.username) return alert('Anda Harus Login')
 
@@ -207,15 +209,23 @@ function createContact(contact) {
         const conversation = await fetchJSON('/api/conversation/message/' + contact.id_chat, options)
         sendMessageButton.dataset.id = contact.id_chat
         chatRoom = contact.id_chat
-
+        
+        
         removeSelectedContact()
-
+        
         if (!div.classList.contains('selected')) div.classList.add('selected')
-
+        
         listenChannel()
         chatUser.innerText = contact.sender.username
         
         const message = conversation.chat
+        const msgByTime = {}
+
+        for (const chat of message) {
+            const date = new Date(chat.created_at)
+            // const index = 
+        }
+        // console.log(message)
         
         if (message.length === 0) removeChat()
 
@@ -229,6 +239,8 @@ function createContact(contact) {
             containerUser.classList.add('hidden')
             containerChat.classList.remove('hidden')
         }
+        chatOutput.scrollTop = chatOutput.scrollHeight - chatOutput.offsetHeight;
+        // chatOutput.scrollBy(0, chatOutput.clientHeight)
     })
 
     containerUser.appendChild(div)
