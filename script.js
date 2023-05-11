@@ -29,7 +29,7 @@ let IsMobile = false
 // IsMobile
 checkMobile()
 window.addEventListener('resize', function(e) {
-    checkMobile()
+    // checkMobile()
 })
 
 // Check Is Login
@@ -214,6 +214,7 @@ function createContact(contact) {
         
         
         removeSelectedContact()
+        removeChat()
         
         if (!div.classList.contains('selected')) div.classList.add('selected')
         
@@ -277,8 +278,10 @@ async function getAllConversation() {
 
 function removeChat() {
     const allChat = document.querySelectorAll('.chat')
+    const allTime = document.querySelectorAll('.date-chat')
 
     for (const chat of allChat) chat.remove()
+    for (const time of allTime) time.remove()
 }
 
 function removeContact() {
