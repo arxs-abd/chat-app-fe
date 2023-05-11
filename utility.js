@@ -3,6 +3,15 @@ let formatter = new Intl.DateTimeFormat('id-ID', {
     minute: '2-digit',
 })
 
+let formatterTimeDivisionDate = new Intl.DateTimeFormat('id-ID', {
+    month : 'long',
+    day : '2-digit',
+    year : 'numeric'
+})
+let formatterTimeDivisionDay = new Intl.DateTimeFormat('id-ID', {
+    weekday : 'long'
+})
+
 // Utility Function
 
 async function fetchJSON(url, options = {}) {

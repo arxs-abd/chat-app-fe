@@ -113,6 +113,8 @@ sendMessageButton.addEventListener('click', async function(e) {
 
     if (!userData.username) return alert('Anda Harus Login')
 
+    if (inputMessage.value === '') return
+
     const id = userData.id
     const message = inputMessage.value
     const conversationId = sendMessageButton.dataset.id
@@ -223,16 +225,24 @@ function createContact(contact) {
 
         for (const chat of message) {
             const date = new Date(chat.created_at)
-            // const index = 
+            const day = date.getDate()
+            const month = date.getMonth()
+            const year = date.getFullYear()
+            const newDate = new Date(`${year}-${month}-${day}`)
+
+            if (!msgByTime[newDate]) msgByTime[newDate] = []
+            msgByTime[newDate].push(chat)
         }
-        // console.log(message)
+
+        for (const timeChat in msgByTime) {
+            createTimeDiv(timeChat)
+            for (const chat of msgByTime[timeChat]) {
+                    if (chat.sender_id === data.id) createChatByUser(chat)
+                    else createChatByOtherUser(chat)
+                }
+        }
         
         if (message.length === 0) removeChat()
-
-        for (const chat of message) {
-            if (chat.sender_id === data.id) createChatByUser(chat)
-            else createChatByOtherUser(chat)
-        }
 
         // toggle
         if (IsMobile) {
@@ -295,4 +305,23 @@ function checkMobile() {
         if (backButton.style.display !== 'none') backButton.style.display = 'none'
 
     }
+}
+
+function createTimeDiv(time) {
+    const f = new Intl.RelativeTimeFormat('id-ID', {
+        style : 'long',
+        numeric : 'auto'
+    })
+    const today = new Date()
+    // const before = new Date('2023-5-3')
+    const before = new Date(time)
+    const span = document.createElement('span')
+    span.classList.add('date-chat')
+    const minDay = before.getDate() - today.getDate()
+    if (minDay > 0 || minDay < -7) span.innerText = formatterTimeDivisionDate.format(before)
+    else if (minDay <= -3 && minDay >= -7) span.innerText = formatterTimeDivisionDay.format(before)
+    else if (minDay <= 0 && minDay >= -2) span.innerText = f.format(minDay, 'days')
+    // else span.innerText = f.format(before - today, 'days')
+    // else if (minDay <= -1) span.innerText = f.format(minDay, 'days')
+    chatOutput.appendChild(span)
 }

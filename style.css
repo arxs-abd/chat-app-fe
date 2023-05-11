@@ -4,13 +4,14 @@
 #393053
 #18122B */
 
+
 :root {
   /* --bgcolor : #18122B;
   --color1 : #635985;
   --color2 : #443C68;
   --color3 : #393053; */
   --bgcolor : #050505;
-  --color1 : #6A6767; /*bg button*/
+  --color1 : #524e4e; /*bg button*/
   --color2 : #383838; /*bg contact*/
   --color3 : #171917; /* bg chat*/
 }
@@ -20,15 +21,34 @@
   padding: 0;
   box-sizing: border-box;
   color: white;
+  /* font-family: 'Lato', sans-serif; */
 }
 
 html {
   background-color: var(--bgcolor);
 }
 
+button, input[type="text"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
 h1 {
   text-align: center;
   margin-bottom: 30px;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Optional */
+  margin: 0;
 }
 
 .container {
@@ -50,6 +70,7 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--color3);
+  font-family: 'Lato', sans-serif;
   /* height: 100%; */
 }
 
@@ -75,6 +96,7 @@ h1 {
 .chat-contact {
   display: flex;
   /* flex-direction: column; */
+  font-family: 'Inter', sans-serif;
   padding: 5px;
   column-gap: 10px;
   height: 12%;
@@ -103,13 +125,16 @@ h1 {
   flex-direction: column;
   text-align: left;
   height: fit-content;
+  font-size: xx-large;
 }
 
 .chat-output {
+  padding: 10px;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   height: 88%;
+  font-family: 'Inter', sans-serif !important;
 }
 
 .chat {
@@ -125,6 +150,7 @@ h1 {
 .date-chat {
   font-size: small;
   font-weight: normal;
+  text-transform: capitalize;
   /* margin: 10px 0 10px 0; */
   background-color: grey;
   color: white;
@@ -139,7 +165,8 @@ h1 {
   text-align: left;
   font-weight: 200;
   max-width: 90%;
-  font-size: 20px;
+  font-size: 15px;
+  font-weight: normal;
   width: fit-content;
   background-color: var(--color2);
   padding: 5px;
@@ -165,7 +192,7 @@ h1 {
 }
 
 .by-user .chat-text {
-  background-color: var(--color1);
+  background-color: darkblue;
 }
 
 .chat-input {
@@ -177,12 +204,13 @@ h1 {
 
 input {
   height: 80%;
-  width: 80%;
+  width: 75%;
 }
 
 button {
   height: 80%;
   width: 20%;
+  border-radius: 10px;
 }
 
 /* Container User */
@@ -191,12 +219,15 @@ button {
   align-self: flex-start;
   width: 30%;
   height: 100%;
-  background-color: var(--color2);
+  background-color: var(--color3);
+  font-family: 'Lato', sans-serif;
 }
 
 #username {
   display: block;
 }
+
+
 
 .item-card {
   display: flex;
@@ -208,6 +239,11 @@ button {
   font-weight: bolder;
   margin: 5px;
   padding: 5px;
+  /* text-transform: capitalize; */
+}
+
+.item-card > span:first-child {
+  text-transform: capitalize;
 }
 
 .item-card:hover {
@@ -223,10 +259,12 @@ button {
   margin: 5px;
   padding: 5px;
   text-align: center;
+  font-size: 2rem;
   background-color: var(--color1);
   color: white;
   font-weight: bold;
   cursor: pointer;
+  text-transform: capitalize;
 }
 
 .find-user {
@@ -257,6 +295,20 @@ button {
 .last-chat {
   font-size: 15px;
   font-weight: 200;
+}
+
+#text {
+  background-color: var(--color2);
+  font-size: large;
+  padding: 2px;
+  font-weight: lighter;
+  border-radius: 10px;
+  /* margin: 10px 0; */
+}
+
+#send {
+  background-color: var(--bgcolor);
+  font-size: medium;
 }
 
 .online {
