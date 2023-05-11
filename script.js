@@ -27,7 +27,7 @@ let chatRoom = ''
 let IsMobile = false
 
 // IsMobile
-checkMobile()
+// checkMobile()
 window.addEventListener('resize', function(e) {
     // checkMobile()
 })
