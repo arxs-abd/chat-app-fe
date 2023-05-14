@@ -1,6 +1,9 @@
 // HTML Component
 const login = document.querySelector('.user')
+const loginButton = document.querySelector('#login-button')
 const findUser = document.querySelector('.find-user')
+const container = document.querySelector('.container')
+const containerLogin = document.querySelector('.container-login')
 const containerUser = document.querySelector('.container-user')
 const containerChat = document.querySelector('.container-chat')
 const chatOutput = document.querySelector('.chat-output')
@@ -9,25 +12,30 @@ const sendMessageButton = document.querySelector('#send')
 const chatUser = document.querySelector('#user-to')
 const chatStatus = document.querySelector('#user-to-status')
 const backButton = document.querySelector('#back')
-// backButton.style.display = 'none'
-// console.log(backButton)
+const loading = document.querySelector('.loading')
 
 // Environment
 // const mobileWidth = 560
-const mobileWidth = 560
+// const mobileWidth = 580
+const mobileWidth = 580
 const dev = getEnv(window.location.href)
-const BASEURL = dev ? 'http://localhost:3000' : 'https://zany-puce-lamb-cap.cyclic.app/'
+const BASEURL = dev ? 'http://localhost:3001' : 'https://zany-puce-lamb-cap.cyclic.app/'
 let socket_id
+// Pusher.logToConsole = true
 
 // Data
 let data = getFromLocalStorage('user-data', {})
 let message = getFromLocalStorage('message-data')
-let contact = getFromLocalStorage('contact-data') 
+let contact = getFromLocalStorage('contact-data')
+// let pusher
+// let channel
 let chatRoom = ''
+let chatRoomBfr = ''
 let IsMobile = false
+let onlineUsers = {}
 
 // IsMobile
-// checkMobile()
+checkMobile()
 window.addEventListener('resize', function(e) {
     // checkMobile()
 })
@@ -35,8 +43,9 @@ window.addEventListener('resize', function(e) {
 // Check Is Login
 if (data.username) {
     login.innerText = data.username
-
-    // Create Conversation Id
+    container.classList.remove('hidden')
+    containerLogin.classList.add('hidden')
+    // initPusher()
     getAllConversation()
     
 }
@@ -61,10 +70,13 @@ findUser.addEventListener('click', async function(e) {
 
 })
 
-login.addEventListener('click', async function(e) {
+loginButton.addEventListener('click', async function(e) {
     e.preventDefault()
-    const username = prompt('Masukkan Username')
-    const password = prompt('Masukkan Password')
+    loading.classList.remove('hidden')
+    containerLogin.classList.add('hidden')
+    
+    const username = document.querySelector('input[name="username"]').value
+    const password = document.querySelector('input[name="password"]').value
 
     const options = {
         method : 'POST',
@@ -75,29 +87,69 @@ login.addEventListener('click', async function(e) {
     }
     const result = await fetchJSON('/api/login', options)
     if (!result) return
-    alert(`Login dengan username ${result.data.username} Berhasil`)
     data = result.data
     data.accessToken = result.accessToken
     setFromLocalStorage('user-data', data)
     
     login.innerText = result.data.username
-
+    // initPusher()
     getAllConversation()
+    container.classList.remove('hidden')
+    loading.classList.add('hidden')
 })
 
+login.addEventListener('click', function() {
+    localStorage.removeItem('user-data')
+
+    container.classList.add('hidden')
+    containerLogin.classList.remove('hidden')
+})
+
+login.addEventListener('mouseover', function() {
+    login.innerText = 'logout'
+})
+login.addEventListener('mouseout', function() {
+    login.innerText = data.username
+})
+
+// Pusher Configuration
 
 const pusher = new Pusher('914eb719506342bd7d28', {
-    cluster : 'ap1'
+    cluster : 'ap1', 
+    authEndpoint : BASEURL + '/pusher/auth',
+    auth : {
+        params : {
+            user_id : data.id,
+            username : data.username
+        }
+    }
 })
-pusher.connection.bind('connected', () => {
+
+pusher.connection.bind('connected', async () => {
     socket_id = pusher.connection.socket_id
 })
 
-const channel = pusher.subscribe('chat-room')
+const channel = pusher.subscribe('presence-chat-room')
+
+channel.bind('pusher:subscription_succeeded', () => {
+    onlineUsers = channel.members.members
+})
+
+channel.bind('pusher:member_added', (member) => {
+    const idNow = chatUser.dataset.id
+    if (!onlineUsers.hasOwnProperty(member.id)) onlineUsers[idNow] = null
+    if (idNow === member.id) chatStatus.innerText = 'Online'
+})
+channel.bind("pusher:member_removed", (member) => {
+    const idNow = chatUser.dataset.id
+    delete onlineUsers[member]
+    if (idNow === member.id) chatStatus.innerText = 'Offline'
+})
 
 function listenChannel() {
+
+    if (chatRoomBfr !== '') channel.unbind(chatRoomBfr)
     channel.bind(chatRoom, data => {
-        console.log(data)
         createChatByOtherUser(data)
     })
 }
@@ -110,8 +162,6 @@ inputMessage.addEventListener('keydown', function(e) {
 
 sendMessageButton.addEventListener('click', async function(e) {
     const userData = getFromLocalStorage('user-data', {})
-
-    if (!userData.username) return alert('Anda Harus Login')
 
     if (inputMessage.value === '') return
 
@@ -210,6 +260,7 @@ function createContact(contact) {
         }
         const conversation = await fetchJSON('/api/conversation/message/' + contact.id_chat, options)
         sendMessageButton.dataset.id = contact.id_chat
+        chatRoomBfr = chatRoom + ''
         chatRoom = contact.id_chat
         
         
@@ -220,6 +271,10 @@ function createContact(contact) {
         
         listenChannel()
         chatUser.innerText = contact.sender.username
+        chatUser.dataset.id = contact.sender.id
+
+        if (onlineUsers.hasOwnProperty(contact.sender.id)) chatStatus.innerText = 'Online'
+        else chatStatus.innerText = 'Offline'
         
         const message = conversation.chat
         const msgByTime = {}
@@ -245,11 +300,6 @@ function createContact(contact) {
         
         if (message.length === 0) removeChat()
 
-        // toggle
-        if (IsMobile) {
-            containerUser.classList.add('hidden')
-            containerChat.classList.remove('hidden')
-        }
         chatOutput.scrollTop = chatOutput.scrollHeight - chatOutput.offsetHeight;
         // chatOutput.scrollBy(0, chatOutput.clientHeight)
     })
@@ -294,6 +344,40 @@ function removeSelectedContact() {
     const allContact = document.querySelectorAll('.item-card')
 
     for (const contact of allContact) if (contact.classList.contains('selected')) contact.classList.remove('selected')
+}
+
+function initPusher() {
+    pusher = new Pusher('914eb719506342bd7d28', {
+        cluster : 'ap1', 
+        authEndpoint : BASEURL + '/pusher/auth',
+        auth : {
+            params : {
+                user_id : data.id,
+                username : data.username
+            }
+        }
+    })
+
+    pusher.connection.bind('connected', async () => {
+        socket_id = pusher.connection.socket_id
+    })
+
+    channel = pusher.subscribe('presence-chat-room')
+
+    channel.bind('pusher:subscription_succeeded', () => {
+        onlineUsers = channel.members.members
+    })
+
+    channel.bind('pusher:member_added', (member) => {
+        const idNow = chatUser.dataset.id
+        if (!onlineUsers.hasOwnProperty(member.id)) onlineUsers[idNow] = null
+        if (idNow === member.id) chatStatus.innerText = 'Online'
+    })
+    channel.bind("pusher:member_removed", (member) => {
+        const idNow = chatUser.dataset.id
+        delete onlineUsers[member]
+        if (idNow === member.id) chatStatus.innerText = 'Offline'
+    })
 }
 
 function checkMobile() {
