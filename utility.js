@@ -42,3 +42,17 @@ function getFromLocalStorage(key, falseResult = []) {
 function setFromLocalStorage(key, value) {
     return localStorage.setItem(key, JSON.stringify(value))
 }
+
+async function getNotifPermission() {
+    return await Notification.requestPermission()
+}
+
+function sendNotification(msg) {
+    let title = 'New Message'
+    let body = 'Pesan dari Teman anda yaitu : ' + msg.message;
+    let notification = new Notification(title, { body });
+    notification.onclick = () => {
+        notification.close()
+        window.parent.focus()
+    }
+}

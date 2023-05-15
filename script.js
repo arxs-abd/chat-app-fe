@@ -27,6 +27,7 @@ let socket_id
 let data = getFromLocalStorage('user-data', {})
 let message = getFromLocalStorage('message-data')
 let contact = getFromLocalStorage('contact-data')
+let focus = true
 // let pusher
 // let channel
 let chatRoom = ''
@@ -34,18 +35,20 @@ let chatRoomBfr = ''
 let IsMobile = false
 let onlineUsers = {}
 
-// IsMobile
-checkMobile()
-window.addEventListener('resize', function(e) {
-    // checkMobile()
-})
+// // IsMobile
+// checkMobile()
+// window.addEventListener('resize', function(e) {
+//     // checkMobile()
+// })
+
+let notifPermission = getNotifPermission()
 
 // Check Is Login
 if (data.username) {
     login.innerText = data.username
     container.classList.remove('hidden')
     containerLogin.classList.add('hidden')
-    // initPusher()
+    initPusher()
     getAllConversation()
     
 }
@@ -92,7 +95,7 @@ loginButton.addEventListener('click', async function(e) {
     setFromLocalStorage('user-data', data)
     
     login.innerText = result.data.username
-    // initPusher()
+    initPusher()
     getAllConversation()
     container.classList.remove('hidden')
     loading.classList.add('hidden')
@@ -112,45 +115,16 @@ login.addEventListener('mouseout', function() {
     login.innerText = data.username
 })
 
-// Pusher Configuration
-
-const pusher = new Pusher('914eb719506342bd7d28', {
-    cluster : 'ap1', 
-    authEndpoint : BASEURL + '/pusher/auth',
-    auth : {
-        params : {
-            user_id : data.id,
-            username : data.username
-        }
-    }
-})
-
-pusher.connection.bind('connected', async () => {
-    socket_id = pusher.connection.socket_id
-})
-
-const channel = pusher.subscribe('presence-chat-room')
-
-channel.bind('pusher:subscription_succeeded', () => {
-    onlineUsers = channel.members.members
-})
-
-channel.bind('pusher:member_added', (member) => {
-    const idNow = chatUser.dataset.id
-    if (!onlineUsers.hasOwnProperty(member.id)) onlineUsers[idNow] = null
-    if (idNow === member.id) chatStatus.innerText = 'Online'
-})
-channel.bind("pusher:member_removed", (member) => {
-    const idNow = chatUser.dataset.id
-    delete onlineUsers[member]
-    if (idNow === member.id) chatStatus.innerText = 'Offline'
-})
-
 function listenChannel() {
 
     if (chatRoomBfr !== '') channel.unbind(chatRoomBfr)
     channel.bind(chatRoom, data => {
         createChatByOtherUser(data)
+        // if (document.visibilityState === 'hidden') return sendNotification(data)
+        if (!focus) sendNotification(data)
+        // window.onblur = function(e) {
+        //     return sendNotification(data)
+        // }
     })
 }
 
@@ -404,6 +378,7 @@ function createTimeDiv(time) {
     const before = new Date(time)
     const span = document.createElement('span')
     span.classList.add('date-chat')
+    span.dataset.time = before.getTime()
     const minDay = before.getDate() - today.getDate()
     if (minDay > 0 || minDay < -7) span.innerText = formatterTimeDivisionDate.format(before)
     else if (minDay <= -3 && minDay >= -7) span.innerText = formatterTimeDivisionDay.format(before)
@@ -411,4 +386,16 @@ function createTimeDiv(time) {
     // else span.innerText = f.format(before - today, 'days')
     // else if (minDay <= -1) span.innerText = f.format(minDay, 'days')
     chatOutput.appendChild(span)
+}
+
+// Listener
+
+window.onfocus = () => {
+    focus = true
+    console.log('Ke Focus')
+}
+
+window.onblur = () => {
+    focus = false
+    console.log('Keluar Focus')
 }
