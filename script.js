@@ -124,15 +124,15 @@ sendMessageButton.addEventListener('click', async function(e) {
     const id = userData.id
     const message = inputMessage.value
     const conversationId = sendMessageButton.dataset.id
-    // await fetchJSON('/api/chat', {
-    //     method : 'POST',
-    //     headers : {
-    //       'Content-Type' : 'application/json',
-    //       'x-socket-id' : socket_id,
-    //       'Authorization' : 'Bearer ' + userData.accessToken
-    //     },
-    //     body : JSON.stringify({ conversationId, id, message})
-    // })
+    await fetchJSON('/api/chat', {
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json',
+          'x-socket-id' : socket_id,
+          'Authorization' : 'Bearer ' + userData.accessToken
+        },
+        body : JSON.stringify({ conversationId, id, message})
+    })
     inputMessage.value = ''
     const data = {
         created_at : new Date().toISOString(),
