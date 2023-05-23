@@ -1,5 +1,6 @@
 // HTML Component
 const login = document.querySelector('.user')
+const formLogin = document.querySelector('#login-form')
 const loginButton = document.querySelector('#login-button')
 const findUser = document.querySelector('.find-user')
 const container = document.querySelector('.container')
@@ -73,32 +74,12 @@ findUser.addEventListener('click', async function(e) {
 
 })
 
-loginButton.addEventListener('click', async function(e) {
-    e.preventDefault()
-    loading.classList.remove('hidden')
-    containerLogin.classList.add('hidden')
-    
-    const username = document.querySelector('input[name="username"]').value
-    const password = document.querySelector('input[name="password"]').value
+formLogin.addEventListener('submit', async function(e) {
+    await loginApp(e)
+})
 
-    const options = {
-        method : 'POST',
-        headers : {
-          'Content-Type' : 'application/json'
-        },
-        body : JSON.stringify({ username, password })
-    }
-    const result = await fetchJSON('/api/login', options)
-    if (!result) return
-    data = result.data
-    data.accessToken = result.accessToken
-    setFromLocalStorage('user-data', data)
-    
-    login.innerText = result.data.username
-    initPusher()
-    getAllConversation()
-    container.classList.remove('hidden')
-    loading.classList.add('hidden')
+loginButton.addEventListener('click', async function(e) {
+    await loginApp(e)
 })
 
 login.addEventListener('click', function() {
@@ -135,6 +116,7 @@ inputMessage.addEventListener('keydown', function(e) {
 })
 
 sendMessageButton.addEventListener('click', async function(e) {
+    e.preventDefault()
     const userData = getFromLocalStorage('user-data', {})
 
     if (inputMessage.value === '') return
@@ -142,21 +124,23 @@ sendMessageButton.addEventListener('click', async function(e) {
     const id = userData.id
     const message = inputMessage.value
     const conversationId = sendMessageButton.dataset.id
-    e.preventDefault()
-    await fetchJSON('/api/chat', {
-        method : 'POST',
-        headers : {
-          'Content-Type' : 'application/json',
-          'x-socket-id' : socket_id,
-          'Authorization' : 'Bearer ' + userData.accessToken
-        },
-        body : JSON.stringify({ conversationId, id, message})
-    })
+    // await fetchJSON('/api/chat', {
+    //     method : 'POST',
+    //     headers : {
+    //       'Content-Type' : 'application/json',
+    //       'x-socket-id' : socket_id,
+    //       'Authorization' : 'Bearer ' + userData.accessToken
+    //     },
+    //     body : JSON.stringify({ conversationId, id, message})
+    // })
     inputMessage.value = ''
     const data = {
         created_at : new Date().toISOString(),
         message
     }
+    const allDate = document.querySelectorAll('.date-chat')
+    const lastDate = allDate.item(allDate.length - 1).innerText
+    if (lastDate !== 'Hari Ini') createTimeDiv(new Date())
     createChatByUser(data)
 })
 
@@ -383,19 +367,45 @@ function createTimeDiv(time) {
     if (minDay > 0 || minDay < -7) span.innerText = formatterTimeDivisionDate.format(before)
     else if (minDay <= -3 && minDay >= -7) span.innerText = formatterTimeDivisionDay.format(before)
     else if (minDay <= 0 && minDay >= -2) span.innerText = f.format(minDay, 'days')
-    // else span.innerText = f.format(before - today, 'days')
-    // else if (minDay <= -1) span.innerText = f.format(minDay, 'days')
     chatOutput.appendChild(span)
+}
+
+async function loginApp(e) {
+    e.preventDefault()
+    loading.classList.remove('hidden')
+    containerLogin.classList.add('hidden')
+
+    
+    const username = document.querySelector('input[name="username"]').value
+    const password = document.querySelector('input[name="password"]').value
+    
+    const options = {
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({ username, password })
+    }
+    const result = await fetchJSON('/api/login', options)
+    if (!result) return
+    data = result.data
+    data.accessToken = result.accessToken
+    setFromLocalStorage('user-data', data)
+    document.querySelector('input[name="password"]').value = ''
+    
+    login.innerText = result.data.username
+    initPusher()
+    getAllConversation()
+    container.classList.remove('hidden')
+    loading.classList.add('hidden')
 }
 
 // Listener
 
 window.onfocus = () => {
     focus = true
-    console.log('Ke Focus')
 }
 
 window.onblur = () => {
     focus = false
-    console.log('Keluar Focus')
 }
