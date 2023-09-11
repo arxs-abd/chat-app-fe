@@ -10,6 +10,7 @@
     <script defer src="utility.js"></script>
     <script defer src="script.js"></script>
     <!-- <script defer src="component.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 </head>
 
@@ -17,6 +18,43 @@
     <div class="loading hidden">
         <div class="lds-facebook"><div></div><div></div><div></div></div>
     </div>
+
+    <div id="addFreindModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Add Your Freind</h2>
+            </div>
+            <div class="modal-body">
+                <div class="chat-input-freind">
+                    <input class="text" type="text" name="input-friend" value="" placeholder="Search Your Freind" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="callModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header" style="font-size: x-large">
+                <!-- <span class="close">&times;</span> -->
+                <h4 style="font-weight: lighter;">Panggilan Suara</h4>
+                <h2 id="call-name" style="font-weight: bold;"></h2>
+                <h5 id="call-status" style="font-weight: lighter;">Memanggil</h5>
+            </div>
+            <div class="modal-body">
+                <h1 class="call-picture" style="font-size: 200px; color: black;">
+                    👦🏿
+                </h1>
+                <button id="stop-call">Tutup</button>
+                <div id="answer-container" class="hidden" style="display: flex; flex-direction: column;">
+                    <button id="accept-call">Terima</button>
+                    <button id="reject-call">Tolak</button>
+                </div>
+            </div>
+        </div>
+        <div id="call-container" class="hidden"></div>
+    </div>
+
     <div class="container-login">
         <form class="login-box" id="login-form">
                 <h1>Login Chat Apps</h1>
@@ -41,12 +79,15 @@
             </div>
             <div class="container-chat border">
                 <div class="chat-contact border">
-                    <div id="back">
+                    <!-- <div id="back">
                         <span>🡰</span>
-                    </div>
+                    </div> -->
                     <div class="contact">
                         <span id="user-to" data-id="1641471038593">Budi</span>
                         <span id="user-to-status" class="status">Offline</span>
+                    </div>
+                    <div id="call" style="cursor: pointer; margin-top: 15px; margin-right: 10px;">
+                        <svg style="color: white" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-call"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" fill="white"></path></svg>
                     </div>
                 </div>
                 <div class="chat-output border">
@@ -76,7 +117,7 @@
                     </div> -->
                 </div>
                 <div class="chat-input">
-                    <input id="text" type="text" name="input-chat" value="" placeholder="Enter Your Message" autofocus>
+                    <input id="text" type="text" name="input-chat" value="" placeholder="Enter Your Message" autofocus autocomplete="off">
                     <button id="send">Send</button>
                 </div>
             </div>

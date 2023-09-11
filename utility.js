@@ -47,6 +47,10 @@ async function getNotifPermission() {
     return await Notification.requestPermission()
 }
 
+async function getMicPermission() {
+    await navigator.mediaDevices.getUserMedia({video : false, audio : true})
+}
+
 function sendNotification(msg) {
     let title = 'New Message'
     let body = 'Pesan dari Teman anda yaitu : ' + msg.message;
@@ -55,4 +59,22 @@ function sendNotification(msg) {
         notification.close()
         window.parent.focus()
     }
+}
+
+function formatTime(seconds) {
+    if (typeof seconds !== 'number' || isNaN(seconds)) {
+        return '00:00'
+      }
+      const minutes = Math.floor(seconds / 60)
+      const remainingSeconds = seconds % 60
+    
+      const formattedMinutes = String(minutes).padStart(2, '0')
+      const formattedSeconds = String(remainingSeconds).padStart(2, '0')
+    
+      return `${formattedMinutes}:${formattedSeconds}`
+}
+
+function showMessage(message) {
+    let dev = getEnv(window.location.href)
+    if (dev) console.log(message)
 }
